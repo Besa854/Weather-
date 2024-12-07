@@ -10,7 +10,7 @@
       background-image: url('IMG_20241130_174101_399.jpg');
       background-size: cover;
       background-position: center;
-      color: #333;
+      color: #fff;
       text-align: center;
       padding: 20px;
       height: 100vh;
@@ -19,10 +19,10 @@
     .container {
       max-width: 400px;
       margin: auto;
-      background: rgba(255, 255, 255, 0.8); /* Transparent white background for contrast */
+      background: rgba(0, 0, 0, 0.6);
       padding: 20px;
       border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     }
     input, button {
       padding: 10px;
@@ -40,7 +40,7 @@
       margin: 10px auto;
     }
     .weather-element {
-      font-size: 24px;
+      font-size: 20px;
       margin: 10px 0;
     }
     .weather-element span {
@@ -50,7 +50,7 @@
 </head>
 <body>
   <div class="container">
-    <h1> Live from Chileshe's weather </h1>
+    <h1> Live from Chileshe's Weather </h1>
     <h2>Check your weather iwe😂😂</h2>
     <input type="text" id="cityInput" placeholder="Enter city name">
     <button id="getWeather">Get Weather</button>
@@ -97,11 +97,19 @@
           const sunrise = new Date(data.sys.sunrise * 1000).toLocaleTimeString();
           const sunset = new Date(data.sys.sunset * 1000).toLocaleTimeString();
 
+          // Correct local time calculation
+          const timezoneOffset = data.timezone * 1000; // Convert to milliseconds
+          const currentUtcTime = new Date().getTime(); // UTC time in milliseconds
+          const localTime = new Date(currentUtcTime + timezoneOffset - 2 * 60 * 60 * 1000).toLocaleTimeString(); // Adjust by 2 hours
+
           weatherIcon.src = iconUrl;
           weatherIcon.style.display = 'block';
 
+          // Displaying the results
           weatherDetails.innerHTML = `
             <p><strong>City:</strong> ${city}</p>
+            <p><strong>Country:</strong> ${getCountryName(data.sys.country)}</p>
+            <p><strong>Local Time:</strong> ${localTime}</p>
             <div class="weather-element">
               <img src="https://img.icons8.com/ios-filled/50/000000/thermometer.png" alt="Temperature" width="24">
               <span><strong>Temperature:</strong> ${temp}°C</span>
@@ -115,7 +123,7 @@
               <span><strong>Humidity:</strong> ${humidity}%</span>
             </div>
             <div class="weather-element">
-              <img src="https://img.icons8.com/ios-filled/50/000000/wind.png" alt="Wind" width="24">
+              <img src="https://img.icons8.com/ios-filled/50/000000/wind.png" alt="Wind Speed" width="24">
               <span><strong>Wind Speed:</strong> ${windSpeed} m/s</span>
             </div>
             <div class="weather-element">
@@ -141,6 +149,17 @@
           weatherIcon.style.display = 'none';
         });
     });
+
+    // Function to convert country codes to full names
+    function getCountryName(code) {
+      const countries = {
+        ZM: 'Zambia',
+        US: 'United States',
+        GB: 'United Kingdom',
+        // Add more as needed
+      };
+      return countries[code] || code;
+    }
   </script>
 </body>
 </html>
