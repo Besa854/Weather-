@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-image: url('IMG_20230511_092326.jpg');
+      background-size: cover;
+      background-position: center;
+      color: #333;
+      text-align: center;
+      padding: 20px;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      max-width: 400px;
+      margin: auto;
+      background: rgba(255, 255, 255, 0.8); /* Transparent white background for contrast */
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px 0;
+      width: 100%;
+      font-size: 16px;
+    }
+    #weatherResult {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+    #weatherIcon {
+      width: 100px;
+      height: 100px;
+      margin: 10px auto;
+    }
+    .weather-element {
+      font-size: 24px;
+      margin: 10px 0;
+    }
+    .weather-element span {
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Weather App</h1>
+    <input type="text" id="cityInput" placeholder="Enter city name">
+    <button id="getWeather">Get Weather</button>
+    <div id="weatherResult">
+      <img id="weatherIcon" src="" alt="Weather Icon" style="display: none;">
+      <div id="weatherDetails"></div>
+    </div>
+  </div>
+  <script>
+    const apiKey = '1558712c506c6f7e5925a28a93b6b118';
+    const getWeatherButton = document.getElementById('getWeather');
+    const cityInput = document.getElementById('cityInput');
+    const weatherResult = document.getElementById('weatherResult');
+    const weatherIcon = document.getElementById('weatherIcon');
+    const weatherDetails = document.getElementById('weatherDetails');
+
+    getWeatherButton.addEventListener('click', () => {
+      const city = cityInput.value.trim();
+
+      if (city === '') {
+        weatherDetails.innerText = 'Please enter a city name.';
+        weatherIcon.style.display = 'none';
+        return;
+      }
+
+      const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
+
+      fetch(url)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('City not found');
+          }
+          return response.json();
+        })
+        .then(data => {
+          const temp = data.main.temp;
+          const weather = data.weather[0].description;
+          const humidity = data.main.humidity;
+          const windSpeed = data.wind.speed;
+          const pressure = data.main.pressure;
+          const visibility = data.visibility;
+          const iconCode = data.weather[0].icon;
+          const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
+          const sunrise = new Date(data.sys.sunrise * 1000).toLocaleTimeString();
+          const sunset = new Date(data.sys.sunset * 1000).toLocaleTimeString();
+
+          weatherIcon.src = iconUrl;
+          weatherIcon.style.display = 'block';
+
+          weatherDetails.innerHTML = `
+            <p><strong>City:</strong> ${city}</p>
+            <div class="weather-element">
+              <img src="https://img.icons8.com/ios-filled/50/000000/thermometer.png" alt="Temperature" width="24">
+              <span><strong>Temperature:</strong> ${temp}°C</span>
+            </div>
+            <div class="weather-element">
+              <img src="https://img.icons8.com/ios-filled/50/000000/cloud.png" alt="Weather" width="24">
+              <span><strong>Weather:</strong> ${weather}</span>
+            </div>
+            <div class="weather-element">
+              <img src="https://img.icons8.com/ios-filled/50/000000/humidity.png" alt="Humidity" width="24">
+              <span><strong>Humidity:</strong> ${humidity}%</span>
+            </div>
+            <div class="weather-element">
+              <img src="https://img.icons8.com/ios-filled/50/000000/wind.png" alt="Wind" width="24">
+              <span><strong>Wind Speed:</strong> ${windSpeed} m/s</span>
+            </div>
+            <div class="weather-element">
+              <img src="https://img.icons8.com/ios-filled/50/000000/pressure.png" alt="Pressure" width="24">
+              <span><strong>Pressure:</strong> ${pressure} hPa</span>
+            </div>
+            <div class="weather-element">
+              <img src="https://img.icons8.com/ios-filled/50/000000/visible.png" alt="Visibility" width="24">
+              <span><strong>Visibility:</strong> ${(visibility / 1000).toFixed(2)} km</span>
+            </div>
+            <div class="weather-element">
+              <img src="https://img.icons8.com/ios-filled/50/000000/sun.png" alt="Sunrise" width="24">
+              <span><strong>Sunrise:</strong> ${sunrise}</span>
+            </div>
+            <div class="weather-element">
+              <img src="https://img.icons8.com/ios-filled/50/000000/moon.png" alt="Sunset" width="24">
+              <span><strong>Sunset:</strong> ${sunset}</span>
+            </div>
+          `;
+        })
+        .catch(error => {
+          weatherDetails.innerText = error.message;
+          weatherIcon.style.display = 'none';
+        });
+    });
+  </script>
+</body>
+</html>
